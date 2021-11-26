@@ -234,7 +234,7 @@ function Clientes({ navigation }) {
   }
 
   return (
-    <View style={{flexDirection: 'row', backgroundColor: 'white'}}>
+    <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'white'}}>
       <BarraLateral navigation={navigation}/>
       <KeyboardAvoidingView style = {{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white'}}>
         <Text style={stylesCadastro.h1Logo}>Cadastro de Clientes</Text>
@@ -338,7 +338,7 @@ function Veiculos({ navigation }) {
   const [categorias, setCategoria] = React.useState()
 
   return (
-    <View style={{flexDirection: 'row', backgroundColor: 'white'}}>
+    <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'white'}}>
       <BarraLateral navigation={navigation}/>
       <KeyboardAvoidingView style = {{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white'}}>
         <Text style={stylesCadastro.h1Logo}>Cadastro de Veiculos</Text>
@@ -402,7 +402,7 @@ function Veiculos({ navigation }) {
 function Categorias({ navigation }) {
   
   return (
-    <View style={{flexDirection: 'row', backgroundColor: 'white'}}>
+    <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'white'}}>
       <BarraLateral navigation={navigation}/>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <Text>Você está em Categorias</Text>
