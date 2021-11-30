@@ -1,0 +1,18 @@
+{
+  "name": "sicredi-locacao",
+  "version": "1.0.1",
+  "description": "SicrediLocacao",
+  "main": "server.js",
+  "dependencies": {
+    "cors": "2.8.5",
+    "express": "4.17.1",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "start",
+    "start": "forever start server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}

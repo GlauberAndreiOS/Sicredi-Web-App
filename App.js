@@ -18,11 +18,54 @@ const windowHeight = Dimensions.get('window').height;
 import stylesCadastro from './Styles/stylesCadastro';
 
 function Dashboard({ navigation }) {
-  const [quantidade, setQuantidade] = React.useState(34);
-  const [meta, setMeta] = React.useState(50);
-  const [totalDispo, setTotalDispo] = React.useState(50);
-  const [indispo, setIndispo] = React.useState(15);
-  const [speed, setSpeed] = React.useState('slow');
+  const [quantidade, setQuantidade] = React.useState();
+  const [meta, setMeta] = React.useState();
+  const [total, setTotal] = React.useState();
+  const [indispo, setIndispo] = React.useState();
+  const [loading, setLoading] = React.useState(false);
+
+  async function getDashboardData(){
+    setLoading(true)
+    axios.get('http://localhost:3002/getTotalVeiculos')
+    .then((result)=>{
+      setTotal(result.data.total)
+    })
+    .catch((err)=>{
+      console.log(err)
+    })
+    .finally(()=>setLoading(false))
+
+    axios.get('http://localhost:3002/getVeiculosIndispo')
+    .then((result)=>{
+      setIndispo(result.data.indispo)
+    })
+    .catch((err)=>{
+      console.log(err)
+    })
+    .finally(()=>setLoading(false))
+
+    axios.get('http://localhost:3002/getLocacoes')
+    .then((result)=>{
+      setQuantidade(result.data.locacoes)
+    })
+    .catch((err)=>{
+      console.log(err)
+    })
+    .finally(()=>setLoading(false))
+
+    axios.get('http://localhost:3002/getMeta')
+    .then((result)=>{
+      setMeta(result.data.meta)
+    })
+    .catch((err)=>{
+      console.log(err)
+    })
+    .finally(()=>setLoading(false))
+  }
+
+  React.useEffect(() => {
+    getDashboardData()
+  }, [])
   
   const data = {
     labels: ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"],
@@ -51,89 +94,93 @@ function Dashboard({ navigation }) {
     useShadowColorFromDataset: false // optional
   };
 
-  return (
-    <View style={{flex: 1, backgroundColor: '#E5E5E5'}}>
-      <View style={{flex: 1, backgroundColor: '#E5E5E5', justifyContent: 'space-between', flexDirection: 'row', marginRight: 300}}>
-        <BarraLateral navigation={navigation}/>
-        <LineChart
-          style={{borderRadius: 20, alignSelf: 'flex-start', marginTop: 20, marginLeft: 20}}
-          fromZero={true}
-          withDots={true}
-          withShadow={false}
-          segments={5}
-          data={data}
-          width={windowWidth-250-150}
-          height={350}
-          chartConfig={chartConfig}
-          bezier
-        />
-      </View>
-      <View style={{ backgroundColor: '#E5E5E5', width: (windowWidth-250-150), justifyContent: 'space-between', marginLeft: 110, marginBottom: 20, flexDirection: 'row', alignItems: 'center' }}>
-        <Disponibilidade locacoes={quantidade} totalDisp={totalDispo} indisponiveis={indispo} />
-        <Indisponiveis indisponiveis={indispo} totalDisp={totalDispo} />
-        <Meta locacoes={quantidade} meta={meta} />
-      </View>
-      <View style={{ width: 250, position: 'absolute', backgroundColor: 'white', alignSelf: 'flex-end', alignItems: 'center', justifyContent: 'center', height: '100%', paddingTop: 30 }}>
-      <Image source={{uri:'https://logospng.org/download/sicredi/logo-sicredi-icon-1024.png'}} style={{ width: 92, height: 92 }}/>
-      <View style={{flex:1, alignItems: 'center', justifyContent: 'center'}}>
-        <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', width: 200, marginLeft: 10, marginTop: 20, justifyContent: 'space-between'}} onPress={()=>{navigation.navigate('Locações')}}>
-          <View style={{width: 50, height: 50, backgroundColor: '#3FA110', justifyContent: 'center', alignItems: 'center', borderRadius: 32}}>
-            <Image source={require('./assets/car-key.png')} style={{ width: 32, height: 32}}/>
-          </View>
-          <Text style={{fontSize: 16, textAlign: 'flex-start', fontFamily: 'MontserratRegular'}}>Locações</Text>
-          <View style={{borderColor: '#787878', borderWidth: 1, borderRadius: 5}}>
-            <AntDesign name="right"  size={24} color="black" />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', width: 200, marginLeft: 10, marginTop: 20, justifyContent: 'space-between'}} onPress={()=>{navigation.navigate('Veículos')}}>
-          <View style={{width: 50, height: 50, backgroundColor: '#3FA110', justifyContent: 'center', alignItems: 'center', borderRadius: 32}}>
-            <Image source={require('./assets/traffic-jam.png')} style={{ width: 32, height: 32}}/>
-          </View>
-          <Text style={{fontSize: 16, textAlign: 'flex-start', fontFamily: 'MontserratRegular'}}>Veículos</Text>
-          <View style={{borderColor: '#787878', borderWidth: 1, borderRadius: 5}}>
-            <AntDesign name="right"  size={24} color="black" />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', width: 200, marginLeft: 10, marginTop: 20, justifyContent: 'space-between'}} onPress={()=>{navigation.navigate('Clientes')}}>
-          <View style={{width: 50, height: 50, backgroundColor: '#3FA110', justifyContent: 'center', alignItems: 'center', borderRadius: 32}}>
-            <Image source={require('./assets/value.png')} style={{ width: 32, height: 32}}/>
-          </View>
-          <Text style={{fontSize: 16, textAlign: 'flex-start', fontFamily: 'MontserratRegular'}}>Clientes</Text>
-          <View style={{borderColor: '#787878', borderWidth: 1, borderRadius: 5}}>
-            <AntDesign name="right"  size={24} color="black" />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', width: 200, marginLeft: 10, marginTop: 20, justifyContent: 'space-between'}} onPress={()=>{navigation.navigate('Categorias')}}>
-          <View style={{width: 50, height: 50, backgroundColor: '#3FA110', justifyContent: 'center', alignItems: 'center', borderRadius: 32}}>
-            <Image source={require('./assets/menu.png')} style={{ width: 32, height: 32}}/>
-          </View>
-          <Text style={{fontSize: 16, textAlign: 'flex-start', fontFamily: 'MontserratRegular'}}>Categorias</Text>
-          <View style={{borderColor: '#787878', borderWidth: 1, borderRadius: 5}}>
-            <AntDesign name="right" size={24} color="black" />
-          </View>
-        </TouchableOpacity>
-        <Text style={{fontSize: 16, textAlign: 'center', paddingTop: 15, fontFamily: 'MontserratBold'}}>Locações</Text>
-        <View style={{flexDirection: 'row'}}>
-          <Text style={{fontSize: 16, textAlign: 'center', fontWeight: 'bold', fontFamily: 'MontserratBold'}}>{quantidade}</Text>
-          <Text style={{fontSize: 16, textAlign: 'center', color: '#787878', fontFamily: 'MontserratBold'}}>/semana</Text>
+  if(!loading){
+    return (
+      <View style={{flex: 1, backgroundColor: '#E5E5E5'}}>
+        <View style={{flex: 1, backgroundColor: '#E5E5E5', justifyContent: 'space-between', flexDirection: 'row', marginRight: 300}}>
+          <BarraLateral navigation={navigation}/>
+          <LineChart
+            style={{borderRadius: 20, alignSelf: 'flex-start', marginTop: 20, marginLeft: 20}}
+            fromZero={true}
+            withDots={true}
+            withShadow={false}
+            segments={5}
+            data={data}
+            width={windowWidth-250-150}
+            height={350}
+            chartConfig={chartConfig}
+            bezier
+          />
         </View>
-        {meta/3 <= quantidade ? 
-          meta/3*2 >= quantidade ? 
-            <MaterialCommunityIcons name="speedometer-medium" size={96} color="#3FA110" /> : 
-            <MaterialCommunityIcons name="speedometer" size={96} color="#3FA110" /> 
-          : <MaterialCommunityIcons name="speedometer-slow" size={96} color="#3FA110" />
-        }
+        <View style={{ backgroundColor: '#E5E5E5', width: (windowWidth-250-150), justifyContent: 'space-between', marginLeft: 110, marginBottom: 20, flexDirection: 'row', alignItems: 'center' }}>
+          <Disponibilidade locacoes={quantidade} totalVeic={total} indisp={indispo} />
+          <Indisponiveis indisp={indispo} totalVeic={total} />
+          <Meta locacoes={quantidade} meta={meta} />
+        </View>
+        <View style={{ width: 250, position: 'absolute', backgroundColor: 'white', alignSelf: 'flex-end', alignItems: 'center', justifyContent: 'center', height: '100%', paddingTop: 30 }}>
+        <Image source={{uri:'https://logospng.org/download/sicredi/logo-sicredi-icon-1024.png'}} style={{ width: 92, height: 92 }}/>
+        <View style={{flex:1, alignItems: 'center', justifyContent: 'center'}}>
+          <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', width: 200, marginLeft: 10, marginTop: 20, justifyContent: 'space-between'}} onPress={()=>{navigation.navigate('Locações')}}>
+            <View style={{width: 50, height: 50, backgroundColor: '#3FA110', justifyContent: 'center', alignItems: 'center', borderRadius: 32}}>
+              <Image source={require('./assets/car-key.png')} style={{ width: 32, height: 32}}/>
+            </View>
+            <Text style={{fontSize: 16, textAlign: 'flex-start', fontFamily: 'MontserratRegular'}}>Locações</Text>
+            <View style={{borderColor: '#787878', borderWidth: 1, borderRadius: 5}}>
+              <AntDesign name="right"  size={24} color="black" />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', width: 200, marginLeft: 10, marginTop: 20, justifyContent: 'space-between'}} onPress={()=>{navigation.navigate('Veículos')}}>
+            <View style={{width: 50, height: 50, backgroundColor: '#3FA110', justifyContent: 'center', alignItems: 'center', borderRadius: 32}}>
+              <Image source={require('./assets/traffic-jam.png')} style={{ width: 32, height: 32}}/>
+            </View>
+            <Text style={{fontSize: 16, textAlign: 'flex-start', fontFamily: 'MontserratRegular'}}>Veículos</Text>
+            <View style={{borderColor: '#787878', borderWidth: 1, borderRadius: 5}}>
+              <AntDesign name="right"  size={24} color="black" />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', width: 200, marginLeft: 10, marginTop: 20, justifyContent: 'space-between'}} onPress={()=>{navigation.navigate('Clientes')}}>
+            <View style={{width: 50, height: 50, backgroundColor: '#3FA110', justifyContent: 'center', alignItems: 'center', borderRadius: 32}}>
+              <Image source={require('./assets/value.png')} style={{ width: 32, height: 32}}/>
+            </View>
+            <Text style={{fontSize: 16, textAlign: 'flex-start', fontFamily: 'MontserratRegular'}}>Clientes</Text>
+            <View style={{borderColor: '#787878', borderWidth: 1, borderRadius: 5}}>
+              <AntDesign name="right"  size={24} color="black" />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', width: 200, marginLeft: 10, marginTop: 20, justifyContent: 'space-between'}} onPress={()=>{navigation.navigate('Categorias')}}>
+            <View style={{width: 50, height: 50, backgroundColor: '#3FA110', justifyContent: 'center', alignItems: 'center', borderRadius: 32}}>
+              <Image source={require('./assets/menu.png')} style={{ width: 32, height: 32}}/>
+            </View>
+            <Text style={{fontSize: 16, textAlign: 'flex-start', fontFamily: 'MontserratRegular'}}>Categorias</Text>
+            <View style={{borderColor: '#787878', borderWidth: 1, borderRadius: 5}}>
+              <AntDesign name="right" size={24} color="black" />
+            </View>
+          </TouchableOpacity>
+          <Text style={{fontSize: 16, textAlign: 'center', paddingTop: 15, fontFamily: 'MontserratBold'}}>Locações</Text>
+          <View style={{flexDirection: 'row'}}>
+            <Text style={{fontSize: 16, textAlign: 'center', fontWeight: 'bold', fontFamily: 'MontserratBold'}}>{quantidade}</Text>
+            <Text style={{fontSize: 16, textAlign: 'center', color: '#787878', fontFamily: 'MontserratBold'}}>/semana</Text>
+          </View>
+          {meta/3 <= quantidade ? 
+            meta/3*2 >= quantidade ? 
+              <MaterialCommunityIcons name="speedometer-medium" size={96} color="#3FA110" /> : 
+              <MaterialCommunityIcons name="speedometer" size={96} color="#3FA110" /> 
+            : <MaterialCommunityIcons name="speedometer-slow" size={96} color="#3FA110" />
+          }
+          </View>
         </View>
       </View>
-    </View>
-  );
+    );
+  }else{
+    return(
+      <View style={{flex: 1, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator size={'large'} color={'#3FA110'} />
+      </View>
+    );
+  }
 }
 
-function Disponibilidade( {locacoes, totalDisp, indisponiveis} ){
-
-  var progress = 1-(locacoes+indisponiveis)/totalDisp
-  const [progressState, setProgressState] = React.useState(progress)
-
+function Disponibilidade( {locacoes, totalVeic, indisp} ){
   return(
     <View style={{backgroundColor: 'white', width: 300, height: 200, borderRadius: 20, marginRight: 20}}>
       <LinearGradient
@@ -145,18 +192,14 @@ function Disponibilidade( {locacoes, totalDisp, indisponiveis} ){
       <Text style={{ color: '#787878', fontSize: 14, alignSelf: 'center', fontFamily: 'MontserratRegular'}}>Total de carros disponiveis para locação</Text>
       <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', alignSelf: 'center', marginTop: 40, width: '75%'}}>
         <Text style={{ color: '#3FA110', fontSize: 16, alignSelf: 'center', fontFamily: 'MontserratRegular'}}>Progresso</Text>
-        <Text style={{ color: '#3FA110', fontSize: 16, alignSelf: 'center', fontFamily: 'MontserratRegular'}}>{Math.round(progressState*100)}%</Text>
-      </View>
-      <ProgressBar progress={progressState}  color='#3FA110' width={225} style={{alignSelf: 'center', marginTop: 10}} />
+        <Text style={{ color: '#3FA110', fontSize: 16, alignSelf: 'center', fontFamily: 'MontserratRegular'}}>{Math.round((1-(locacoes+indisp)/totalVeic)*100)}%</Text>
+      </View>{console.log(1-(locacoes+indisp)/totalVeic)}
+      <ProgressBar progress={(1-(locacoes+indisp)/totalVeic)}  color='#3FA110' width={225} style={{alignSelf: 'center', marginTop: 10}} />
     </View>
   )
 }
 
-function Indisponiveis( {indisponiveis, totalDisp} ){
-
-  var progress = indisponiveis/totalDisp
-  const [progressState, setProgressState] = React.useState(progress)
-
+function Indisponiveis( {indisp, totalVeic} ){
   return (
     <View style={{backgroundColor: 'white', width: 300, height: 200, borderRadius: 20, marginRight: 20}}>
       <LinearGradient
@@ -168,18 +211,14 @@ function Indisponiveis( {indisponiveis, totalDisp} ){
       <Text style={{ color: '#787878', fontSize: 14, alignSelf: 'center', fontFamily: 'MontserratRegular'}}>Em Concerto / Manutenção</Text>
       <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', alignSelf: 'center', marginTop: 40, width: '75%'}}>
         <Text style={{ color: '#3FA110', fontSize: 16, alignSelf: 'center', fontFamily: 'MontserratRegular'}}>Progresso</Text>
-        <Text style={{ color: '#3FA110', fontSize: 16, alignSelf: 'center', fontFamily: 'MontserratRegular'}}>{Math.round(progressState*100)}%</Text>
+        <Text style={{ color: '#3FA110', fontSize: 16, alignSelf: 'center', fontFamily: 'MontserratRegular'}}>{Math.round((indisp/totalVeic)*100)}%</Text>
       </View>
-      <ProgressBar progress={progressState}  color='#3FA110' width={225} style={{alignSelf: 'center', marginTop: 10}} />
+      <ProgressBar progress={(indisp/totalVeic)}  color='#3FA110' width={225} style={{alignSelf: 'center', marginTop: 10}} />
     </View>
   );
 }
 
 function Meta( {locacoes, meta} ){
-
-  var progress = locacoes/meta
-  const [progressState, setProgressState] = React.useState(progress)
-  
   return(
     <View style={{backgroundColor: 'white', width: 300, height: 200, borderRadius: 20}}>
       <LinearGradient colors={['#3FA110', '#3FA11099']} style={{width: 80, height: 70, alignSelf: 'center', alignItems: 'center', justifyContent:'center', top: -35, borderRadius: 20}}>
@@ -189,9 +228,9 @@ function Meta( {locacoes, meta} ){
       <Text style={{ color: '#787878', fontSize: 14, alignSelf: 'center', fontFamily: 'MontserratRegular'}}>Semanal</Text>
       <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', alignSelf: 'center', marginTop: 40, width: '75%'}}>
         <Text style={{ color: '#3FA110', fontSize: 16, alignSelf: 'center', fontFamily: 'MontserratRegular'}}>Progresso</Text>
-        <Text style={{ color: '#3FA110', fontSize: 16, alignSelf: 'center', fontFamily: 'MontserratRegular'}}>{Math.round(progressState*100)}%</Text>
+        <Text style={{ color: '#3FA110', fontSize: 16, alignSelf: 'center', fontFamily: 'MontserratRegular'}}>{Math.round((locacoes/meta)*100)}%</Text>
       </View>
-      <ProgressBar progress={progressState}  color='#3FA110' width={225} style={{alignSelf: 'center', marginTop: 10}} />
+      <ProgressBar progress={(locacoes/meta)}  color='#3FA110' width={225} style={{alignSelf: 'center', marginTop: 10}} />
     </View>
   );
 }
@@ -221,10 +260,35 @@ function Clientes({ navigation }) {
   const [cvv, setCvv] = React.useState()
   const [vencimento, setVencimento] = React.useState('')
 
+  async function postCadastroVeiculo(){
+    axios.post('http://localhost:3002/inserirClientes',{
+      cliente: {
+        nome: nome,
+        cpf: cpf,
+        cnh: cnh,
+        cep: cep,
+        endereco: endereco.logradouro,
+        numero: numeroCasa,
+        cidade: endereco.localidade,
+        estado: endereco.uf,
+        bairro: endereco.bairro,
+        complemento: complemento,
+        telefone: telefone,
+        cartaoCredito: cartaoCredito,
+        vencimentoCartao: vencimento
+      }
+    })
+    .then((result)=>{
+      console.log(result)
+    })
+    .catch((error)=>{
+      console.log(error)
+    })
+  }
+
   async function getEndereco(cep){
     axios.get('https://viacep.com.br/ws/'+cep+'/json')
     .then((result)=>{
-      setHideNumero(false)
       setEndereco(result.data)
       setTelefone(result.data.ddd)
     })
@@ -295,7 +359,7 @@ function Clientes({ navigation }) {
             issuer: 'visa-or-mastercard'
           }}
           value={cartaoCredito}
-          onChangeText={cartaoCredito => {setCartaoCredito(cartaoCredito)}}
+          onChangeText={(cartaoCredito) => {setCartaoCredito(cartaoCredito)}}
           style={stylesCadastro.input}
         />
         <TextInputMask
@@ -319,7 +383,7 @@ function Clientes({ navigation }) {
           style={stylesCadastro.input}
         />
         <TouchableOpacity style = {stylesCadastro.btnConfirmar} onPress={()=>{
-          navigation.navigate('Dashboard')
+          postCadastroVeiculo()
         }}>
           <Text style={stylesCadastro.textConfirmar}>Confirmar</Text>
         </TouchableOpacity>
@@ -331,69 +395,189 @@ function Clientes({ navigation }) {
 function Veiculos({ navigation }) {
   
   const [placa, setPlaca] = React.useState('')
-  const [renavan, setRenavan] = React.useState()
+  const [renavam, setRenavam] = React.useState()
   const [modelo, setModelo] = React.useState('')
   const [fabricante, setFabricante] = React.useState('')
   const [ano, setAno] = React.useState('')
-  const [categorias, setCategoria] = React.useState()
+  const [categoria, setCategoria] = React.useState()
+  const [useCategoria, setUseCategoria] = React.useState()
+  const [disponivel, setDisponivel] = React.useState()
+  const [erro, setErro] = React.useState('')
+
+  async function postCadastroVeiculo(){
+    axios.post('http://localhost:3002/cadastrarVeiculo',{
+      veiculo: {
+        placa: placa,
+        renavam: renavam,
+        modelo: modelo,
+        fabricante: fabricante,
+        ano: ano,
+        disponivel: disponivel,
+        categoria: categoria
+      }
+    })
+    .then((result)=>{
+      if(result.data.length){
+        setErro('Veiculo já cadastrado')
+        setPlaca(result.data[0].placa)
+        setModelo(result.data[0].modelo)
+        setFabricante(result.data[0].fabricante)
+        setAno(result.data[0].ano)
+        setCategoria(result.data[0].categoria_idCategoria)
+      }
+    })
+    .catch((error)=>{
+      setErro(error)
+    })
+  }
+
+  async function postAtualizaCadastroVeiculo(){
+    axios.post('http://localhost:3002/atualizarCadastroVeiculo',{
+      veiculo:{
+        placa: placa,
+        renavam: renavam,
+        modelo: modelo,
+        fabricante: fabricante,
+        ano: ano,
+        disponivel: disponivel,
+        categoria: categoria
+      }
+    })
+    .then((result)=>{
+      console.log(result)
+      if(result.status === 204){
+        setErro(result)
+      }else{
+        
+      }
+    })
+    .catch((error)=>{
+      setErro(error)
+    })
+  }
 
   return (
     <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'white'}}>
       <BarraLateral navigation={navigation}/>
       <KeyboardAvoidingView style = {{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white'}}>
-        <Text style={stylesCadastro.h1Logo}>Cadastro de Veiculos</Text>
-        <TextInputMask placeholder="Placa"
-          type={'custom'}
-          options={{
-            mask: 'AAA-9*99'
-          }}
-          value={placa}
-          onChangeText={placa=>{setPlaca(placa.toUpperCase())}
-          }
-          style={stylesCadastro.input}
-        />
-        <TextInputMask placeholder = "Renavan"
-          type={'custom'}
-          options={{
-            mask: '99999999999'
-          }}
-          value={renavan}
-          onChangeText={renavan => {setRenavan(renavan)}}
-          style={stylesCadastro.input}
-        />
-        <TextInput style={stylesCadastro.input}
-        placeholder="Modelo"
-        value={modelo}
-        onChangeText={(modelo)=>{setModelo(modelo)}}/>
-        <TextInput style={stylesCadastro.input}
-        placeholder="Fabricante"
-        value={fabricante}
-        onChangeText={(fabricante)=>{setFabricante(fabricante)}}/>
-        <TextInputMask placeholder="Ano"
-        type={'custom'}
-          options={{
-            mask: '9999/9999'
-          }}
-          value={ano}
-          onChangeText={ano => {setAno(ano)}}
-          style={stylesCadastro.input}/>
-          <Picker
+        {!erro.length > 0 ? <>
+          <Text style={stylesCadastro.h1Logo}>Cadastro de Veiculos</Text>
+          <TextInputMask placeholder="Placa"
+            type={'custom'}
+            options={{
+              mask: 'AAA-9*99'
+            }}
+            value={placa}
+            onChangeText={placa=>{setPlaca(placa.toUpperCase())}
+            }
             style={stylesCadastro.input}
-            selectedValue={categorias}
-            onValueChange={(itemValue, itemIndex) =>
-              setCategoria(itemValue)
-            }>
-            <Picker.Item label="Carro" value="Carro" />
-            <Picker.Item label="Caminhão" value="Caminhão" />
-            <Picker.Item label="Moto" value="Moto" />
-            <Picker.Item label="Ônibus" value="Ônibus" />
-            <Picker.Item label="Van" value="Van" />
-          </Picker>
-        <TouchableOpacity style = {stylesCadastro.btnConfirmar} onPress={()=>{
-          navigation.navigate('Dashboard')
-        }}>
-          <Text style={stylesCadastro.textConfirmar}>Confirmar</Text>
-        </TouchableOpacity>
+          />
+          <TextInputMask placeholder = "Renavam"
+            type={'custom'}
+            options={{
+              mask: '99999999999'
+            }}
+            value={renavam}
+            onChangeText={renavam => {setRenavam(renavam)}}
+            style={stylesCadastro.input}
+          />
+          <TextInput style={stylesCadastro.input}
+          placeholder="Modelo"
+          value={modelo}
+          onChangeText={(modelo)=>{setModelo(modelo)}}/>
+          <TextInput style={stylesCadastro.input}
+          placeholder="Fabricante"
+          value={fabricante}
+          onChangeText={(fabricante)=>{setFabricante(fabricante)}}/>
+          <TextInputMask placeholder="Ano"
+          type={'custom'}
+            options={{
+              mask: '9999/9999'
+            }}
+            value={ano}
+            onChangeText={ano => {setAno(ano)}}
+            style={stylesCadastro.input}/>
+            <Picker
+              style={stylesCadastro.input}
+              selectedValue={useCategoria}
+              onValueChange={(itemValue, itemIndex) => {
+                setCategoria(itemIndex)
+                setUseCategoria(itemValue)}
+              }>
+              <Picker.Item label="Selecione um Item" value="Selecione um Item" />
+              <Picker.Item label="Carro" value="Carro" />
+              <Picker.Item label="Caminhão" value="Caminhão" />
+              <Picker.Item label="Moto" value="Moto" />
+              <Picker.Item label="Ônibus" value="Ônibus" />
+              <Picker.Item label="Van" value="Van" />
+            </Picker>
+          <TouchableOpacity style = {stylesCadastro.btnConfirmar} onPress={()=>{
+            postCadastroVeiculo()
+          }}>
+            <Text style={stylesCadastro.textConfirmar}>Confirmar</Text>
+          </TouchableOpacity>
+        </>
+        : 
+        <>
+          <Text style={stylesCadastro.h1Logo}>Atualização de Cadastro de Veiculos</Text>
+          <TextInputMask placeholder="Placa"
+            type={'custom'}
+            options={{
+              mask: 'AAA-9*99'
+            }}
+            value={placa}
+            onChangeText={placa=>{setPlaca(placa.toUpperCase())}
+            }
+            style={stylesCadastro.input}
+          />
+          <TextInputMask placeholder = "Renavam"
+            type={'custom'}
+            options={{
+              mask: '99999999999'
+            }}
+            value={renavam}
+            onChangeText={renavam => {setRenavam(renavam)}}
+            style={stylesCadastro.input}
+          />
+          <TextInput style={stylesCadastro.input}
+          placeholder="Modelo"
+          value={modelo}
+          onChangeText={(modelo)=>{setModelo(modelo)}}/>
+          <TextInput style={stylesCadastro.input}
+          placeholder="Fabricante"
+          value={fabricante}
+          onChangeText={(fabricante)=>{setFabricante(fabricante)}}/>
+          <TextInputMask placeholder="Ano"
+          type={'custom'}
+            options={{
+              mask: '9999/9999'
+            }}
+            value={ano}
+            onChangeText={ano => {setAno(ano)}}
+            style={stylesCadastro.input}/>
+            <Picker
+              style={stylesCadastro.input}
+              selectedValue={useCategoria}
+              onValueChange={(itemValue, itemIndex) => {
+                setCategoria(itemIndex)
+                setUseCategoria(itemValue)}
+              }>
+              <Picker.Item label="Selecione um Item" value="Selecione um Item" />
+              <Picker.Item label="Carro" value="Carro" />
+              <Picker.Item label="Caminhão" value="Caminhão" />
+              <Picker.Item label="Moto" value="Moto" />
+              <Picker.Item label="Ônibus" value="Ônibus" />
+              <Picker.Item label="Van" value="Van" />
+            </Picker>
+          <Text style={{paddingVertical: 10, fontFamily: 'MontserratBold', color: 'red', fontSize: 16}}>{erro}</Text>
+          <TouchableOpacity style = {stylesCadastro.btnConfirmar} onPress={()=>{
+            postAtualizaCadastroVeiculo()
+            setErro('')
+            console.log(erro)
+          }}>
+            <Text style={stylesCadastro.textConfirmar}>Atualizar Cadastro</Text>
+          </TouchableOpacity>
+        </>}
       </KeyboardAvoidingView>
     </View>
   );
